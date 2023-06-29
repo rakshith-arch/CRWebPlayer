@@ -53,11 +53,12 @@ import { Book } from "./Models/Models";
         this.playBackEngine.initializeBook(book);
     }
 
-    registerServiceWorker(book: Book): void {
+    async registerServiceWorker(book: Book): Promise<void> {
         if ("serviceWorker" in navigator) {
             let wb = new Workbox("./sw.js", {});
-            wb.register().then((r) => { this.handleServiceWorkerRegistration(r) });
+            await wb.register().then((r) => { this.handleServiceWorkerRegistration(r) });
             console.log("CRapp: Service Worker Registered! Sending Cache Message!");
+            await navigator.serviceWorker.ready;
             this.broadcastChannel.postMessage({
                 command: "Cache",
                 data: {
@@ -82,12 +83,13 @@ import { Book } from "./Models/Models";
         }
     }
 
-    handleServiceWorkerMessage(event: MessageEvent): void {
+    async handleServiceWorkerMessage(event: MessageEvent): Promise<void> {
         if (event.data.msg == "Recache") {
             console.log("CRapp: Recache Message Received!");
             // handleVersionUpdate(event.data);
         }else if (event.data.msg == "Loading") {
             console.log("CRapp: Loading Message Received!");
+            await localStorage.setItem('is_cached','true');
             // handleLoadingMessage(event.data);
         }else if (event.data.msg == "Update Found") {
             console.log("CRapp: Update Found Message Received!");
@@ -98,9 +100,10 @@ import { Book } from "./Models/Models";
     readLanguageDataFromCacheAndNotifyAndroidApp() {
         //@ts-ignore
         if (window.Android) {
-            // let isContentCached: boolean = localStorage.getItem(this.isCached)! === "true";
+            let isContentCached = localStorage.getItem(this.isCached);
+            let isFilesCached = (isContentCached==undefined || isContentCached==null)?false:true;
             //@ts-ignore
-            window.Android.cachedStatus(true);
+            window.Android.cachedStatus(isFilesCached);
         }
     }
 

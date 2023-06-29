@@ -1,6 +1,36 @@
-importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
+importScripts(
+  "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js"
+);
 
-workbox.precaching.precacheAndRoute([{"revision":"573b3a1508b85168db2a648040f3749c","url":"dist/app.js"},{"revision":"c3bf00e585782373e1b601c07b513d85","url":"dist/fonts/Quicksand_Bold.otf"},{"revision":"8546bc86df8d5c909a5d0ad5f5ae1291","url":"dist/images/cropped-bird_red-2-up.webp"},{"revision":"891d5740c1af1fad4da3afee1289c11c","url":"dist/images/cropped-bird_red-2.webp"},{"revision":"d6223ad2dfebbfe22e932087e0ec74f0","url":"dist/images/red_bird_256.webp"},{"revision":"4367b4e57f510a9a75043e5e75cc206a","url":"dist/index.html"},{"revision":"3898363e28ac803232de451798ccd214","url":"dist/styles/app.css"},{"revision":"b95c43e4ca9b8b838c0319d7ba789c33","url":"index.html"},{"revision":"91d600ca317cc9985a0fc479c783f8ad","url":"manifest.json"}], {});
+workbox.precaching.precacheAndRoute(
+  [
+    { revision: "573b3a1508b85168db2a648040f3749c", url: "dist/app.js" },
+    {
+      revision: "c3bf00e585782373e1b601c07b513d85",
+      url: "dist/fonts/Quicksand_Bold.otf",
+    },
+    {
+      revision: "8546bc86df8d5c909a5d0ad5f5ae1291",
+      url: "dist/images/cropped-bird_red-2-up.webp",
+    },
+    {
+      revision: "891d5740c1af1fad4da3afee1289c11c",
+      url: "dist/images/cropped-bird_red-2.webp",
+    },
+    {
+      revision: "d6223ad2dfebbfe22e932087e0ec74f0",
+      url: "dist/images/red_bird_256.webp",
+    },
+    { revision: "4367b4e57f510a9a75043e5e75cc206a", url: "dist/index.html" },
+    {
+      revision: "3898363e28ac803232de451798ccd214",
+      url: "dist/styles/app.css",
+    },
+    { revision: "b95c43e4ca9b8b838c0319d7ba789c33", url: "index.html" },
+    { revision: "91d600ca317cc9985a0fc479c783f8ad", url: "manifest.json" },
+  ],
+  {}
+);
 
 const channel = new BroadcastChannel("cr-message-channel");
 
@@ -38,18 +68,32 @@ function cacheTheBookJSONAndImages(data) {
   console.log("Caching the book JSON and images");
   let bookData = data["bookData"];
   let bookAudioAndImageFiles = [];
-  
+
   for (let i = 0; i < bookData["pages"].length; i++) {
     let page = bookData["pages"][i];
     for (let j = 0; j < page["visualElements"].length; j++) {
       let visualElement = page["visualElements"][j];
       if (visualElement["type"] === "audio") {
-        bookAudioAndImageFiles.push("/BookContent/LetsFlyLevel2En/content/" + visualElement["audioSrc"]);
-        for (let k = 0; k < visualElement["audioTimestamps"]["timestamps"].length; k++) {
-          bookAudioAndImageFiles.push("/BookContent/LetsFlyLevel2En/content/" + visualElement["audioTimestamps"]["timestamps"][k]["audioSrc"]);
+        bookAudioAndImageFiles.push(
+          "/BookContent/LetsFlyLevel2En/content/" + visualElement["audioSrc"]
+        );
+        for (
+          let k = 0;
+          k < visualElement["audioTimestamps"]["timestamps"].length;
+          k++
+        ) {
+          bookAudioAndImageFiles.push(
+            "/BookContent/LetsFlyLevel2En/content/" +
+              visualElement["audioTimestamps"]["timestamps"][k]["audioSrc"]
+          );
         }
-      } else if (visualElement["type"] === "image" && visualElement["imageSource"] !== "empty_glow_image") {
-        bookAudioAndImageFiles.push("/BookContent/LetsFlyLevel2En/content/" + visualElement["imageSource"]);
+      } else if (
+        visualElement["type"] === "image" &&
+        visualElement["imageSource"] !== "empty_glow_image"
+      ) {
+        bookAudioAndImageFiles.push(
+          "/BookContent/LetsFlyLevel2En/content/" + visualElement["imageSource"]
+        );
       }
     }
   }
@@ -75,15 +119,15 @@ function cacheTheBookJSONAndImages(data) {
 
 self.addEventListener("fetch", function (event) {
   const requestUrl = new URL(event.request.url);
-  if (requestUrl.protocol === 'chrome-extension:') {
+  if (requestUrl.protocol === "chrome-extension:") {
     return;
   }
   event.respondWith(
-      caches.match(event.request).then(function (response) {
-          if (response) {
-            return response;
-          }
-          return fetch(event.request);
-      })
+    caches.match(event.request).then(function (response) {
+      if (response) {
+        return response;
+      }
+      return fetch(event.request);
+    })
   );
 });

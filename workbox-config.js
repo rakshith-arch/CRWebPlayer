@@ -1,7 +1,7 @@
 module.exports = {
-    globDirectory: "./",
+    globDirectory: "dist/",
     globPatterns: ["**/*.{wav,mp3,WAV,png,webp,otf,jpg,js,json,css,html}"],
-    swDest: "sw.js",
+    swDest: "dist/sw.js",
     swSrc: "sw-src.js",
     globIgnores:[
         "BookContent/**/*", 
